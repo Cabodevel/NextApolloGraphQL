@@ -28,6 +28,15 @@ const resolvers = {
             } catch (error) {
                 console.log(error);
             }
+        },
+        obtenerProducto: async(_, {id}) => {
+            const producto = await Producto.findById(id);
+
+            if(!producto){
+                throw new Error("El producto no existe")
+            }
+
+            return producto;
         }
     },
     Mutation: {
@@ -82,6 +91,17 @@ const resolvers = {
             }catch(error){
                 console.log(error)
             }
+        },
+        actualizarProducto: async (_, {id, input}) => {
+            let producto = await Producto.findById(id);
+            
+            if(!producto){
+                throw new Error("El producto no existe")
+            }
+
+            producto = await Producto.findOneAndUpdate({_id: id}, input, { new: true });
+
+            return producto;
         }
     }
 }
