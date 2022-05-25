@@ -21,6 +21,16 @@ const typeDefs = gql`
         creado: String
     }
 
+    type Cliente {
+        id: ID
+        nombre: String
+        apellido: String
+        empresa: String
+        email: String
+        telefono: String
+        vandedor: ID
+    }
+
     input UsuarioInput {
         nombre: String
         apellido: String
@@ -37,6 +47,14 @@ const typeDefs = gql`
         nombre: String!
         existencia: Int!
         precio: Float!
+    }
+
+    input ClienteInput {
+        nombre: String!
+        apellido: String!
+        empresa: String!
+        email: String!
+        telefono: String
     }
 
    type Query {
@@ -58,6 +76,9 @@ const typeDefs = gql`
        nuevoProducto(input: ProductoInput) : Producto
        actualizarProducto(id: ID!, input: ProductoInput) : Producto
        eliminarProducto(id:ID!) : String
+
+       #clientes
+        nuevoCliente(input: ClienteInput) : Cliente
    }`;
 
 module.exports = typeDefs;

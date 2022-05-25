@@ -1,5 +1,6 @@
 const Usuario = require('../models/Usuario');
 const Producto = require('../models/Producto');
+const Cliente = require('../models/Cliente');
 
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
@@ -113,6 +114,29 @@ const resolvers = {
             await Producto.findByIdAndDelete({_id: id});
 
             return "Producto eliminado";
+        },
+        nuevoCliente: async (_, { input }, context) => {
+            const { email } = input;
+
+            const cliente = Cliente.findOne(email);
+
+            if(cliente){
+                throw new Error("El cliente ya existe");
+            }
+
+            const nuevoCliente = new Cliente(input);
+
+            nuevoCliente.vendedor = context.usuario.id;
+
+            try {
+                const result = await nuevoCliente.save();
+    
+                return result;
+            } catch (error) {
+                console.log(error);
+            }
+
+           
         }
     }
 }
