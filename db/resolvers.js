@@ -1,4 +1,6 @@
 const Usuario = require('../models/Usuario');
+const Producto = require('../models/Producto');
+
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -13,10 +15,19 @@ const crearToken = (user, secret, expiresIn) =>{
 
 const resolvers = {
     Query: {
-        obtenerUsuario: async(_, {token}) => {
+        obtenerUsuario: async (_, {token}) => {
             const usuarioId = jwt.verify(token, process.env.SECRET);
 
             return usuarioId;
+        },
+        obtenerProductos: async () => {
+            try {
+                const productos = await Producto.find({});
+
+                return productos;
+            } catch (error) {
+                console.log(error);
+            }
         }
     },
     Mutation: {
@@ -59,6 +70,17 @@ const resolvers = {
 
             return {
                 token: crearToken(existeUsuario, process.env.SECRET, '24h')
+            }
+        },
+        nuevoProducto: async(_, {input}) => {
+            try{
+                const producto = new Producto(input);
+
+                const result = await producto.save();
+
+                return result;
+            }catch(error){
+                console.log(error)
             }
         }
     }
