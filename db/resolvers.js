@@ -102,6 +102,17 @@ const resolvers = {
             producto = await Producto.findOneAndUpdate({_id: id}, input, { new: true });
 
             return producto;
+        },
+        eliminarProducto: async (_, {id}) => {
+            let producto = await Producto.findById(id);
+            
+            if(!producto){
+                throw new Error("El producto no existe")
+            }
+
+            await Producto.findByIdAndDelete({_id: id});
+
+            return "Producto eliminado";
         }
     }
 }
