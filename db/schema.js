@@ -31,6 +31,21 @@ const typeDefs = gql`
         vendedor: ID
     }
 
+    type Pedido {
+        id: ID
+        pedido: [PedidoGrupo]
+        total: Float
+        cliente: ID
+        vendedor: ID
+        fecha: String
+        estado: EstadoPedido
+    }
+
+    type PedidoGrupo {
+        id: ID
+        cantidad: Int
+    }
+
     input UsuarioInput {
         nombre: String
         apellido: String
@@ -57,6 +72,24 @@ const typeDefs = gql`
         telefono: String
     }
 
+    input PedidoProductoInput {
+        id: ID
+        cantidad: Int
+    }
+
+    input PedidoInput {
+        pedido: [PedidoProductoInput]
+        total: Float!
+        cliente: ID!
+        estado: EstadoPedido
+    }
+
+    enum EstadoPedido {
+        PENDIENTE
+        COMPLETADO
+        CANCELADO
+    }
+
    type Query {
        #Usuarios
        obtenerUsuario(token: String!): Usuario
@@ -81,10 +114,13 @@ const typeDefs = gql`
        actualizarProducto(id: ID!, input: ProductoInput) : Producto
        eliminarProducto(id:ID!) : String
 
-       #clientes
+       #Clientes
         nuevoCliente(input: ClienteInput) : Cliente
         actualizarCliente(id: ID!, input: ClienteInput) : Cliente
         eliminarCliente(id: ID!) : String
+
+        #Pedidos
+        nuevoPedido(input: PedidoInput) : Pedido
    }`;
 
 module.exports = typeDefs;
