@@ -84,6 +84,7 @@ const typeDefs = gql`
        #clientes
         nuevoCliente(input: ClienteInput) : Cliente
         actualizarCliente(id: ID!, input: ClienteInput) : Cliente
+        eliminarCliente(id: ID!) : String
    }`;
 
 module.exports = typeDefs;

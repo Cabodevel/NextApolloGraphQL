@@ -180,6 +180,21 @@ const resolvers = {
             cliente = await Cliente.findOneAndUpdate({_id: id}, input , {new: true});
 
             return cliente;
+        },
+        eliminarCliente: async (_, {id, input}, context) => {
+            let cliente = await Cliente.findById(id);
+
+            if(!cliente){
+                throw new Error("Cliente no existe");
+            }
+
+            if(cliente.vendedor.toString() !== context.user.id){
+                throw new Error("Acceso no autorizado");
+            }
+
+            await Cliente.findOneAndDelete({_id: id});
+
+            return "Cliente eliminado";
         }
     }
 }
