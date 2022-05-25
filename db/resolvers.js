@@ -38,6 +38,37 @@ const resolvers = {
             }
 
             return producto;
+        },
+        obtenerClientes: async () => {
+            try {
+                const clientes = Cliente.find({});
+
+                return clientes;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        obtenerClientesVendedor: async (_, {}, ctx) => {
+            try {
+                const clientes = Cliente.find({ vendedor: ctx.user.id });
+
+                return clientes;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        obtenerCliente: async (_, {id}, ctx) => {
+            const cliente = await Cliente.findById(id);
+
+            if(!cliente){
+                throw new Error("Cliente no encontrado")
+            }
+
+            if (cliente.vendedor.toString() !== ctx.user.id) {
+                throw new Error("Acceso no autorizado")
+            }
+
+            return cliente;
         }
     },
     Mutation: {
@@ -118,15 +149,14 @@ const resolvers = {
         nuevoCliente: async (_, { input }, context) => {
             const { email } = input;
 
-            const cliente = Cliente.findOne(email);
-
+            const cliente = await Cliente.findOne({email});
             if(cliente){
                 throw new Error("El cliente ya existe");
             }
 
             const nuevoCliente = new Cliente(input);
 
-            nuevoCliente.vendedor = context.usuario.id;
+            nuevoCliente.vendedor = context.user.id;
 
             try {
                 const result = await nuevoCliente.save();
@@ -135,8 +165,21 @@ const resolvers = {
             } catch (error) {
                 console.log(error);
             }
+        },
+        actualizarCliente: async (_, {id, input}, context) => {
+            let cliente = await Cliente.findById(id);
 
-           
+            if(!cliente){
+                throw new Error("Cliente no existe");
+            }
+
+            if(cliente.vendedor.toString() !== context.user.id){
+                throw new Error("Acceso no autorizado");
+            }
+
+            cliente = await Cliente.findOneAndUpdate({_id: id}, input , {new: true});
+
+            return cliente;
         }
     }
 }

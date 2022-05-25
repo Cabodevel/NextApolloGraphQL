@@ -28,7 +28,7 @@ const typeDefs = gql`
         empresa: String
         email: String
         telefono: String
-        vandedor: ID
+        vendedor: ID
     }
 
     input UsuarioInput {
@@ -63,8 +63,12 @@ const typeDefs = gql`
 
         #Productos
         obtenerProductos: [Producto]
-
         obtenerProducto(id: ID!): Producto
+
+        #Clientes
+        obtenerClientes: [Cliente]
+        obtenerClientesVendedor: [Cliente]
+        obtenerCliente(id: ID): Cliente
    }
 
    type Mutation {
@@ -79,6 +83,7 @@ const typeDefs = gql`
 
        #clientes
         nuevoCliente(input: ClienteInput) : Cliente
+        actualizarCliente(id: ID!, input: ClienteInput) : Cliente
    }`;
 
 module.exports = typeDefs;
