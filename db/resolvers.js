@@ -105,6 +105,11 @@ const resolvers = {
             } catch (error) {
                 
             }
+        },
+        obtenerPedidosEstado: async(_, {estado}, context) => {
+            const pedidos = await Pedido.find({vendedor: context.user.id, estado});
+
+            return pedidos
         }
     },
     Mutation: {
