@@ -310,14 +310,7 @@ const resolvers = {
                 throw new Error("Cliente no existe");
             }
 
-            const { cliente } = pedido
-            let clienteExiste = await Cliente.findById(id);
-
-            if(!clienteExiste){
-                throw new Error("Cliente no existe");
-            }
-
-            if(cliente.vendedor.toString() !== context.user.id){
+            if(pedido.vendedor.toString() !== context.user.id){
                 throw new Error("Acceso no autorizado");
             }
 
