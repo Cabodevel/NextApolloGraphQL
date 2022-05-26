@@ -109,7 +109,29 @@ const resolvers = {
         obtenerPedidosEstado: async(_, {estado}, context) => {
             const pedidos = await Pedido.find({vendedor: context.user.id, estado});
 
-            return pedidos
+            return pedidos;
+        },
+        mejoresClientes: async () => {
+            const clientes = await Pedido.aggregate([
+                { $match : {estado : "COMPLETADO" } },
+                { $group : {
+                    _id: "$cliente",
+                    total: {$sum : 'total'}
+                }},
+                {
+                    $lookup: {
+                        from: 'cliente',
+                        localField: '_id',
+                        foreignField: '_id',
+                        as: 'cliente'
+                    }
+                },
+                {
+                    $sort: { total: -1}
+                }
+            ]);
+
+            return clientes;
         }
     },
     Mutation: {
