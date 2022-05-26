@@ -79,8 +79,8 @@ const typeDefs = gql`
 
     input PedidoInput {
         pedido: [PedidoProductoInput]
-        total: Float!
-        cliente: ID!
+        total: Float
+        cliente: ID
         estado: EstadoPedido
     }
 
@@ -102,6 +102,11 @@ const typeDefs = gql`
         obtenerClientes: [Cliente]
         obtenerClientesVendedor: [Cliente]
         obtenerCliente(id: ID): Cliente
+
+        #Pedidos
+        obtenerPedidos: [Pedido]
+        obtenerPedidosVendedor: [Pedido]
+        obtenerPedido(id: ID!): Pedido
    }
 
    type Mutation {
@@ -121,6 +126,8 @@ const typeDefs = gql`
 
         #Pedidos
         nuevoPedido(input: PedidoInput) : Pedido
+        actualizarPedido(id: ID, input: PedidoInput) : Pedido
+        eliminarPedido(id: ID) : String
    }`;
 
 module.exports = typeDefs;

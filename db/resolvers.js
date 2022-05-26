@@ -70,6 +70,41 @@ const resolvers = {
             }
 
             return cliente;
+        },
+        obtenerPedidos: async () => {
+            try {
+                const pedidos = await Pedido.find({});
+
+                return pedidos;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        obtenerPedidosVendedor: async(_, {}, context) => {
+            try {
+                const pedidos = await Pedido.find({vendedor: context.user.id});
+
+                return pedidos;
+            } catch (error) {
+                console.log(error);
+            }
+        },
+        obtenerPedido: async(_, {id}, context) => {
+            try {
+                const pedido = await Pedido.findById(id);
+
+                if(!pedido){
+                    throw new Error("Pedido no encotrado")
+                }
+
+                if(pedido.vendedor.toString() !== context.user.id){
+                    throw new Error("Acceso no autorizado");
+                }
+
+                return pedido;
+            } catch (error) {
+                
+            }
         }
     },
     Mutation: {
@@ -182,7 +217,7 @@ const resolvers = {
 
             return cliente;
         },
-        eliminarCliente: async (_, {id, input}, context) => {
+        eliminarCliente: async (_, {id}, context) => {
             let cliente = await Cliente.findById(id);
 
             if(!cliente){
@@ -230,7 +265,66 @@ const resolvers = {
             const result = await nuevoPedido.save();
 
             return result;
-        }
+        },
+        actualizarPedido: async (_, {id, input}, context) => {
+
+            const { cliente } = input
+
+            let existePedido = await Pedido.findById(id);
+
+            if(!existePedido){
+                throw new Error("Pedido no existe");
+            }
+
+            let clienteExiste = await Cliente.findById(cliente);
+
+            if(!clienteExiste){
+                throw new Error("Cliente no existe");
+            }
+
+            if(clienteExiste.vendedor.toString() !== context.user.id){
+                throw new Error("Acceso no autorizado");
+            }
+
+            for await (const articulo of input.pedido) {
+                const {id} = articulo;
+                const producto = await Producto.findById(id);
+
+                if(articulo.cantidad > producto.existencia){
+                    throw new Error("No hay stock del articulo")
+                }else{
+                    producto.existencia -= articulo.cantidad;
+                    await producto.save();
+                }
+            };
+
+
+            const result = await pedido.findOneAndUpdate({_id: id}, input, { new: true });
+
+            return result;
+        },
+        eliminarPedido: async (_, {id}, context) => {
+            let pedido = await Pedido.findById(id);
+
+            if(!pedido){
+                throw new Error("Cliente no existe");
+            }
+
+            const { cliente } = pedido
+            let clienteExiste = await Cliente.findById(id);
+
+            if(!clienteExiste){
+                throw new Error("Cliente no existe");
+            }
+
+            if(cliente.vendedor.toString() !== context.user.id){
+                throw new Error("Acceso no autorizado");
+            }
+
+            await Pedido.findOneAndDelete({_id: id});
+
+            return "Pedido eliminado";
+        },
     }
 }
 
