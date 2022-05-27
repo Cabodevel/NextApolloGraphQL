@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Layout from '../components/Layout';
 import Error from '../components/Error';
 import { useFormik } from 'formik';
@@ -33,6 +33,8 @@ const OBTENER_CLIENTES_USUARIO = gql`
 
 const NuevoCliente = () => {
   const router = useRouter();
+
+  const [message, setMessage] = useState(null);
 
   const [nuevoCliente] = useMutation(NUEVO_CLIENTE, {
     update(cache, { data: { nuevoCliente } }) {
@@ -77,14 +79,26 @@ const NuevoCliente = () => {
 
         router.push('/');
       } catch (error) {
-        console.log(error);
+        setMessage(error.message.replace('GraphQL error: ', ''));
+        setTimeout(() => {
+          setMessage(null);
+        }, 2000);
       }
     },
   });
 
+  const mostrarMensaje = () => {
+    return (
+      <div className="bg-white py-2 px-3 w-full my-3 max-w-sm text-center mx-auto rounded-sm">
+        <p>{message}</p>
+      </div>
+    );
+  };
+
   return (
     <Layout>
       <h1 className="text-2xl text-gray-800 font-light">Nuevo Cliente</h1>
+      {message && mostrarMensaje()}
       <div className="flex justify-center mt-5">
         <div className="w-full max-w-lg">
           <form
