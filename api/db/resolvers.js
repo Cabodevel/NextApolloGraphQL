@@ -199,7 +199,7 @@ const resolvers = {
                 throw new Error("El usuario no existe");
             }
 
-            const passwordCorrecto = bcryptjs.compare(password, existeUsuario.password);
+            const passwordCorrecto = await bcryptjs.compare(password, existeUsuario.password);
 
             if(!passwordCorrecto){
                 throw new Error("Password incorrecto");
