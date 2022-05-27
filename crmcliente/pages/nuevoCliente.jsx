@@ -3,7 +3,7 @@ import Layout from '../components/Layout';
 import Error from '../components/Error';
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
-
+import { useRouter } from 'next/router';
 import { gql, useMutation } from '@apollo/client';
 
 const NUEVO_CLIENTE = gql`
@@ -21,6 +21,7 @@ const NUEVO_CLIENTE = gql`
 
 const NuevoCliente = () => {
   const [nuevoCliente] = useMutation(NUEVO_CLIENTE);
+  const router = useRouter();
 
   const formik = useFormik({
     initialValues: {
@@ -38,7 +39,21 @@ const NuevoCliente = () => {
         .email('Email invalido')
         .required('El nombre es obligatorio'),
     }),
-    onSubmit: valores => {},
+    onSubmit: async valores => {
+      try {
+        const { data } = await nuevoCliente({
+          variables: {
+            input: {
+              ...valores,
+            },
+          },
+        });
+
+        router.push('/');
+      } catch (error) {
+        console.log(error);
+      }
+    },
   });
 
   return (
