@@ -3,7 +3,7 @@ import { gql, useQuery } from '@apollo/client';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 
-const OBTENER_CLIENTE_USUARIO = gql`
+const OBTENER_CLIENTES_USUARIO = gql`
   query ObtenerClientesVendedor {
     obtenerClientesVendedor {
       id
@@ -16,7 +16,7 @@ const OBTENER_CLIENTE_USUARIO = gql`
 `;
 
 const Index = () => {
-  const { data, loading, error } = useQuery(OBTENER_CLIENTE_USUARIO);
+  const { data, loading, error } = useQuery(OBTENER_CLIENTES_USUARIO);
   const router = useRouter();
 
   if (loading) return 'Cargando...';

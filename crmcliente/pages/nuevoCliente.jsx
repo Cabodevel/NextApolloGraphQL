@@ -19,9 +19,35 @@ const NUEVO_CLIENTE = gql`
   }
 `;
 
+const OBTENER_CLIENTES_USUARIO = gql`
+  query ObtenerClientesVendedor {
+    obtenerClientesVendedor {
+      id
+      nombre
+      apellido
+      empresa
+      email
+    }
+  }
+`;
+
 const NuevoCliente = () => {
-  const [nuevoCliente] = useMutation(NUEVO_CLIENTE);
   const router = useRouter();
+
+  const [nuevoCliente] = useMutation(NUEVO_CLIENTE, {
+    update(cache, { data: { nuevoCliente } }) {
+      const { obtenerClientesVendedor } = cache.readQuery({
+        query: OBTENER_CLIENTES_USUARIO,
+      });
+
+      cache.writeQuery({
+        query: OBTENER_CLIENTES_USUARIO,
+        data: {
+          obtenerClientesVendedor: [...obtenerClientesVendedor, nuevoCliente],
+        },
+      });
+    },
+  });
 
   const formik = useFormik({
     initialValues: {
