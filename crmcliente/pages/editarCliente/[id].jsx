@@ -1,9 +1,11 @@
 import React from 'react';
 import Layout from '../../components/Layout';
+import Error from '../../components/Error';
 import { useRouter } from 'next/router';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
+import Swal from 'sweetalert2';
 
 const OBTENER_CLIENTE = gql`
   query Query($id: ID) {
@@ -17,15 +19,42 @@ const OBTENER_CLIENTE = gql`
   }
 `;
 
+const ACTUALIZAR_CLIENTE = gql`
+  mutation ActualizarCliente($id: ID!, $input: ClienteInput) {
+    actualizarCliente(id: $id, input: $input) {
+      id
+    }
+  }
+`;
+
 const EditarCliente = () => {
   const router = useRouter();
   const { id } = router.query;
 
-  const { data, loading, error } = useQuery(OBTENER_CLIENTE, {
-    variables: {
-      id,
+  const { data, loading, error } = useQuery(
+    OBTENER_CLIENTE,
+    {
+      variables: {
+        id,
+      },
     },
-  });
+    {
+      update(cache, { data: { nuevoCliente } }) {
+        const { obtenerClientesVendedor } = cache.readQuery({
+          query: OBTENER_CLIENTES_USUARIO,
+        });
+
+        cache.writeQuery({
+          query: OBTENER_CLIENTES_USUARIO,
+          data: {
+            obtenerClientesVendedor: [...obtenerClientesVendedor, nuevoCliente],
+          },
+        });
+      },
+    }
+  );
+
+  const [actualizarCliente] = useMutation(ACTUALIZAR_CLIENTE);
 
   const validationSchema = Yup.object({
     nombre: Yup.string().required('El nombre es obligatorio'),
@@ -38,9 +67,30 @@ const EditarCliente = () => {
 
   if (loading) return 'Cargando ...';
 
-  console.log(data);
-  debugger;
   const { obtenerCliente } = data;
+
+  const updateClient = async values => {
+    console.log(values);
+    const { nombre, apellido, telefono, empresa, email } = values;
+
+    await actualizarCliente({
+      variables: {
+        id,
+        input: {
+          nombre,
+          apellido,
+          empresa,
+          telefono,
+          email,
+        },
+      },
+    });
+    Swal.fire('Actualizado', 'Cliente actualizado', 'success');
+    try {
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   return (
     <Layout>
@@ -50,6 +100,10 @@ const EditarCliente = () => {
           <Formik
             validationSchema={validationSchema}
             initialValues={obtenerCliente}
+            onSubmit={values => {
+              updateClient(values);
+            }}
+            enableReinitialize
           >
             {props => {
               return (
