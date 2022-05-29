@@ -11,16 +11,12 @@ const OBTENER_PEDIDOS = gql`
         id
         cantidad
         nombre
+        precio
       }
-      cliente {
-        id
-        nombre
-        apellido
-        email
-        telefono
-      }
-      vendedor
       total
+      cliente
+      vendedor
+      fecha
       estado
     }
   }
@@ -30,7 +26,7 @@ const Pedidos = () => {
   const { data, loading, error } = useQuery(OBTENER_PEDIDOS);
 
   if (loading) return 'Cargando...';
-
+  debugger;
   const { obtenerPedidosVendedor } = data;
 
   return (
